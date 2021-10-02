@@ -214,7 +214,9 @@ def plot_multiple_predictions():
   plt.tight_layout()
   plt.show();
 
-"""## To find best Learing Rate"""
+"""
+## To find best Learing Rate
+"""
 
 # Add a callback
 lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lambda epoch : 1e-4 * 10**(epoch/20))
@@ -230,7 +232,9 @@ plt.xlabel("Learning Rate")
 plt.ylabel("Loss")
 plt.title("Learning Rate vs Loss");
 
-"""## Simple Confusion Matrix (2 labels)"""
+"""
+## Simple Confusion Matrix (2 labels)
+"""
 
 from sklearn.metrics import ConfusionMatrixDisplay,confusion_matrix
 
@@ -248,7 +252,9 @@ cm = confusion_matrix(y_test,tf.round(y_preds))
 cmd = ConfusionMatrixDisplay(cm, [])
 cmd.plot(cmap="Blues",ax=ax,)
 
-"""## Plot Multiple Examples for multiclass images (Random)"""
+"""
+## Plot Multiple Examples for multiclass images (Random)
+"""
 
 # Plot multiple examples
 import random
@@ -260,7 +266,9 @@ for i in range(4):
   plt.imshow(train_data[rand_index])
   plt.axis(False)
 
-"""## Plot predictions for a regression problem"""
+"""
+## Plot predictions for a regression problem
+"""
 
 def plot_predictions(train_data=X_train,train_labels=y_train,test_data=X_test,test_labels=y_test,predictions=y_preds):
   """
@@ -276,7 +284,9 @@ def plot_predictions(train_data=X_train,train_labels=y_train,test_data=X_test,te
   # Make a legend
   plt.legend();
 
-"""## Preprocess data, normalization/standardization in a regression dataset"""
+"""
+## Preprocess data, normalization/standardization in a regression dataset
+"""
 
 # Import classes from sklearn
 from sklearn.compose import make_column_transformer
@@ -300,7 +310,9 @@ ct.fit(X_train)
 X_train_normal = ct.transform(X_train)
 X_test_normal = ct.transform(X_test
 
-"""## Make TensorBoard Callback"""
+"""
+## Make TensorBoard Callback
+"""
 
 import datetime
 
@@ -320,7 +332,9 @@ def create_tensorboard_callback(dir_name, experiment_name):
   print(f"Saving TensorBoard log files to: {log_dir}")
   return tensorboard_callback
 
-"""## Unzip data """
+"""
+## Unzip data
+"""
 
 import zipfile
 
@@ -334,7 +348,9 @@ def unzip_data(filename):
   zip_ref.extractall()
   zip_ref.close()
 
-"""## Walkthrough Directories"""
+"""
+## Walkthrough Directories
+"""
 
 import os
 
@@ -353,7 +369,9 @@ def walk_through_dir(dir_path):
   for dirpath, dirnames, filenames in os.walk(dir_path):
     print(f"There are {len(dirnames)} directories and {len(filenames)} images in '{dirpath}'.")
 
-"""## Calculate Results - y_true,y_preds"""
+"""
+## Calculate Results - y_true,y_preds
+"""
 
 def calculate_results(y_true, y_pred):
   """
@@ -373,7 +391,9 @@ def calculate_results(y_true, y_pred):
                   "f1": model_f1}
   return model_results
 
-"""## Comparing Histories"""
+"""
+## Comparing Histories
+"""
 
 def compare_historys(original_history, new_history, initial_epochs=5):
     """
@@ -419,7 +439,9 @@ def compare_historys(original_history, new_history, initial_epochs=5):
     plt.xlabel('epoch')
     plt.show()
 
-"""## Best Confusion Matrix (MultiClass with percentages)"""
+"""
+## Best Confusion Matrix (MultiClass with percentages)
+"""
 
 import itertools
 import matplotlib.pyplot as plt

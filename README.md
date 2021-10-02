@@ -1,1 +1,1 @@
-# helper_functions for Deep Learning
+Reusable functions

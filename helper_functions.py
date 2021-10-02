@@ -308,7 +308,7 @@ ct.fit(X_train)
 
 # Transform training and test data with normalization (standardization) and OneHotEncoder
 X_train_normal = ct.transform(X_train)
-X_test_normal = ct.transform(X_test
+X_test_normal = ct.transform(X_test)
 
 """
 ## Make TensorBoard Callback

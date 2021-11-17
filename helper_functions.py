@@ -416,3 +416,26 @@ def preprocess_text_with_line_numbers(filename):
       abstract_lines += line # this means all the lines between the id line and the new line belongs to the same abstract
 
   return abstract_samples
+
+# Plot Time Series Data
+
+def plot_time_series(timesteps,values,format=".",start=0,end=None,label=None):
+  """
+  Plots timesteps vs values (values across timesteps)
+
+  Parameters
+  -----------
+  timesteps: array of timesteps values
+  values: array of values across timesteps
+  format: type of graph, eg - . for scatter, - for line, default = .
+  start: start of plot - setting a value will index from the particular timestep
+  end: end of plot - setting a value will end the plot at particular timestep
+  label: a label to show plot about the values
+  """
+  # Plot the series
+  plt.plot(timesteps[start:end], values[start:end], format, label=label)
+  plt.xlabel("Time")
+  plt.ylabel("Bitcoin Price")
+  if label:
+    plt.legend(fontsize=14); # make label bigger
+  plt.grid(True);

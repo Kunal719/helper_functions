@@ -453,6 +453,7 @@ def mean_absolute_scaled_error(y_true,y_preds):
   return mae / mae_naive_no_seasonality
 
 # Create a function to evaluate all evaluation metrics
+
 def calculate_results_time_series(y_true,y_preds):
   """
   Returns a dictionary of MAE, MSE, RMSE, MAPE, MASE metrics for evaluation
@@ -460,10 +461,56 @@ def calculate_results_time_series(y_true,y_preds):
   # Make sure the data is in float32 format
   y_true = tf.cast(y_true, tf.float32)
   y_preds = tf.cast(y_preds, tf.float32)
-  results_dict = {"MAE":tf.keras.metrics.mean_absolute_error(y_true,y_preds).numpy(),
-                  "MSE":tf.keras.metrics.mean_squared_error(y_true,y_preds).numpy(),
-                  "RMSE":tf.math.sqrt(tf.keras.metrics.mean_squared_error(y_true,y_preds)).numpy(),
-                  "MAPE":tf.keras.metrics.mean_absolute_percentage_error(y_true,y_preds).numpy(),
-                  "MASE":mean_absolute_scaled_error(y_true,y_preds).numpy()}
   
-  return results_dict
+  # Calculate different evaluation scores
+  mae = tf.keras.metrics.mean_absolute_error(y_true, y_preds)
+  mse = tf.keras.metrics.mean_squared_error(y_true, y_preds)
+  rmse = tf.math.sqrt(mse)
+  mape = tf.keras.metrics.mean_absolute_percentage_error(y_true, y_preds)
+  mase = mean_absolute_scaled_error(y_true, y_preds)
+  
+  # Check for different horizons by checking the ndims
+  if mae.ndim > 0:
+    mae = tf.reduce_mean(mae)
+    mse = tf.reduce_mean(mse)
+    rmse = tf.reduce_mean(rmse)
+    mape = tf.reduce_mean(mape)
+    mase = tf.reduce_mean(mase)
+
+  return {"MAE":mae.numpy(),
+          "MSE": mse.numpy(),
+          "RMSE": rmse.numpy(),
+          "MAPE": mape.numpy(),
+          "MASE": mase.numpy()}
+
+# Create function to label windowed data
+
+def get_labelled_windows(x, horizon=HORIZON):
+  """
+  Creates labels for windowed dataset
+
+  Example : if horizon=1 then
+  Input = [1, 2, 3, 4, 5, 6, 7, 8] -> Output = ([1, 2, 3, 4, 5, 6, 7], [8])
+  """
+  return x[:,:-horizon],x[:,-horizon:]
+
+# Create function to view Numpy arrays as windows
+
+def make_windows(x, window_size=WINDOW_SIZE, horizon=HORIZON):
+  """
+  Turns a 1D array to a 2D array of sequential labelled windows with window_size and horizon size labels
+  """
+  # 1. Create a window of specific window_size (add the horizon at the end for labelling later)
+  window_step = np.expand_dims(np.arange(window_size+horizon), axis=0)
+
+  # 2. Create a 2D array of multiple window steps (minus 1 to account for 0 indexing)
+  window_indexes = window_step + np.expand_dims(np.arange(len(x) - (window_size+horizon-1)), axis=0).T # create 2D array of windows of size window_size
+  # print(f"Window Indexes : \n {window_indexes, window_indexes.shape}")
+
+  # 3. Index on the target array (time series) with 2D array of multiple window steps
+  windowed_array = x[window_indexes]
+  
+  # 4. Get the labelled windows
+  windows, labels = get_labelled_windows(windowed_array, horizon=horizon)
+  
+  return windows,labels

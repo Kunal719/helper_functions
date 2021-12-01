@@ -514,3 +514,36 @@ def make_windows(x, window_size=WINDOW_SIZE, horizon=HORIZON):
   windows, labels = get_labelled_windows(windowed_array, horizon=horizon)
   
   return windows,labels
+
+# Create function to make predictions in the future
+def make_future_forecasts(values, model, into_future, window_size=WINDOW_SIZE):
+  """
+  Make future forecasts into_future steps after value ends.
+  
+  Returns a list of future forecasts
+  """
+  # 2. Create an empty list for future forecasts/prepare data to forecast on
+  future_forecast = []
+  last_window = values[-WINDOW_SIZE:]
+
+  # 3. Make into_future number of predictions, altering the data which gets predicted on each
+  for _ in range(into_future):
+    # Predict on the last window then append it again and again and again (our model will eventually make forecasts on its own forecast)
+    future_pred = model.predict(tf.expand_dims(last_window, axis=0))
+    print(f"Predicting on : \n {last_window} -> Prediction : {tf.squeeze(future_pred).numpy()}\n")
+
+    # Append predictions to future forecast
+    future_forecast.append(tf.squeeze(future_pred).numpy())
+
+    # Update last window with new pred and get WINDOW_SIZE most recent preds
+    last_window = np.append(last_window, future_pred)[-WINDOW_SIZE:]
+  
+  return future_forecast
+
+def get_future_dates(start_date, into_future, offset=1):
+  """
+  Returns an array of datetime values ranging from start_data to start_data + into_future
+  """
+  start_date = start_date + np.timedelta64(offset, "D")
+  end_date = start_date + np.timedelta64(into_future, "D")
+  return np.arange(start_date, end_date, dtype="datetime64[D]")

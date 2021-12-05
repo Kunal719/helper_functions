@@ -547,3 +547,49 @@ def get_future_dates(start_date, into_future, offset=1):
   start_date = start_date + np.timedelta64(offset, "D")
   end_date = start_date + np.timedelta64(into_future, "D")
   return np.arange(start_date, end_date, dtype="datetime64[D]")
+
+# Making future forecastts of Bitcoins (using the whole data)
+def pred_model_run(values , X, model , into_future , window_size  , horizon, epochs ):
+
+  '''
+  This function train a model for every updated predictions. 
+
+  Arguments:
+  ----------
+      - values --> labels / truth values. Bitcoin prices 
+      - X --> Windowed data of the bitcoin prices (default window size is 7)
+      - model --> compiled model with default horizon 1 
+      - into_future -->  how many time steps to predict in the future? 
+      - window_size --> default is 7 (using the 7 days prices of bitcoin)
+      - horizon --> default is 1 (predicting the price of next day)
+
+  Returns: 
+  --------
+      - model --> a model that has been trained on all the previous predictions + the data
+  '''
+  future_forecast=[]
+  last_window = values[-window_size:]
+  X_all = X
+  y_all = values
+  for _ in range(into_future): 
+
+      # Each time the model is trained for 5 epochs with the updated data
+      model.fit(x = X_all , y = y_all , epochs = epochs , verbose = 0)
+
+      future_pred = model.predict(tf.expand_dims(last_window, axis= 0))
+      #future_pred = model.predict(last_window)
+      print(f'Predicing on: \n {last_window} --> Prediction: {tf.squeeze(future_pred).numpy()}\n')
+
+      future_forecast.append(tf.squeeze(future_pred).numpy())
+      #values = np.append(values , tf.squeeze(future_pred).numpy())
+      for i in range(0 , len(X_all)):
+        x = X_all[i][1:]  # removing the 0th index of the X window ()
+        y = y_all[1:] # removing the 0th index  of y 
+        X = np.append(x , future_pred) # append the future pred at last to X window
+        values = np.append(y , future_pred) # appending the future pred to y 
+
+      # Update the last window 
+      last_window = np.append(last_window , future_pred)[-window_size:]
+
+
+  return model,future_forecast
